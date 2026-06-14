@@ -1,6 +1,6 @@
 # SentinelNet IDS – Enterprise AI SOC Platform
 # AI + Risk Scoring + Blockchain Audit + Threat Intelligence
-# Author: Samyak Biswas | Infosys Springboard
+# Author: Samyak Biswas
 
 import streamlit as st
 import pandas as pd
@@ -89,6 +89,13 @@ st.caption("Threat Intelligence • Risk Scoring • Blockchain-backed SOC")
 # ================== DATA ==================
 def generate_data():
     records = 9000
+
+    timestamps = pd.date_range(
+        start=datetime.now(),
+        periods=records,
+        freq="s"
+    )
+
     return pd.DataFrame({
         "duration": np.random.randint(0, 1000, records),
         "src_bytes": np.random.randint(0, 100000, records),
@@ -99,7 +106,7 @@ def generate_data():
             records,
             p=[0.20, 0.10, 0.20, 0.05, 0.15, 0.30]
         ),
-        "timestamp": pd.date_range(datetime.now(), periods=records, freq="S")
+        "timestamp": timestamps
     })
 
 df = pd.read_csv(uploaded_file) if uploaded_file else generate_data()
@@ -206,9 +213,13 @@ with r2:
     )
 
 # ================== TIMELINE ==================
-timeline = df.groupby(
-    [pd.Grouper(key="timestamp", freq="30S"), "attack_type"]
-).size().reset_index(name="count")
+timeline = (
+    df.groupby(
+        [pd.Grouper(key="timestamp", freq="30s"), "attack_type"]
+    )
+    .size()
+    .reset_index(name="count")
+)
 
 st.plotly_chart(
     px.area(
@@ -257,4 +268,4 @@ st.download_button(
 
 # ================== FOOTER ==================
 st.markdown("---")
-st.caption("🛡️ SentinelNet IDS | AI • Risk • Threat Intelligence • Blockchain | Infosys-Ready")
+st.caption("🛡️ SentinelNet IDS | AI • Risk • Threat Intelligence • Blockchain")
